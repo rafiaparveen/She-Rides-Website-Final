@@ -1,14 +1,13 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import {
-  ShieldCheck,
   Bell,
   ChevronDown,
   Siren,
   LayoutDashboard,
-  Car,
   User,
   LifeBuoy,
+  History,
   CheckCircle2,
   AlertTriangle,
   Clock3,
@@ -19,26 +18,26 @@ import SOSModal from './SOSModal.jsx'
 
 const navLinks = [
   { to: '/', label: 'Dashboard' },
-  { to: '/my-rides', label: 'My Rides' },
-  { to: '/safety', label: 'Safety' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/#about', label: 'About' },
   { to: '/support', label: 'Support' },
-  { to: '/about', label: 'Why SheRides' },
+  { to: '/my-rides', label: 'History' },
+  { to: '/profile', label: 'Profile' },
 ]
 
 const mobileLinks = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/my-rides', label: 'My Rides', icon: Car },
-  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/#about', label: 'About', icon: Sparkles },
   { to: '/support', label: 'Support', icon: LifeBuoy },
-  { to: '/about', label: 'Why SheRides', icon: Sparkles },
+  { to: '/my-rides', label: 'History', icon: History },
+  { to: '/profile', label: 'Profile', icon: User },
 ]
 
 export default function Navbar() {
+  const location = useLocation()
   const [sosOpen, setSosOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
-  const { notifications, markNotificationsRead } = useApp()
+  const { notifications, markNotificationsRead, profile, logout } = useApp()
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
@@ -67,15 +66,15 @@ export default function Navbar() {
           </div>
 
           {/* Center nav links - desktop only */}
-          <nav className="hidden md:flex w-full max-w-[860px] items-center justify-center gap-1.5 rounded-full border border-white/5 bg-slate-900/40 px-1.5 py-1.5">
+          <nav className="hidden md:flex w-full max-w-[700px] items-center justify-center gap-1 rounded-full border border-white/5 bg-slate-900/40 px-1.5 py-1.5">
             {navLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 end={link.to === '/'}
                 className={({ isActive }) =>
-                  `flex-1 min-w-[110px] px-2 py-2 text-center text-sm font-medium rounded-full transition-all ${
-                    isActive
+                  `flex-1 min-w-[80px] px-1.5 py-2 text-center text-sm font-medium rounded-full transition-all ${
+                    getNavLinkActive(link, isActive, location.hash)
                       ? 'bg-gradient-to-r from-neon-pink to-neon-violet text-white shadow-glow'
                       : 'text-slate-400 hover:text-white'
                   }`
@@ -117,8 +116,8 @@ export default function Navbar() {
                     <div className="flex items-center justify-between mb-2 px-1">
                       <div className="flex items-center gap-2">
                         <img
-                          src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80"
-                          alt="Sarah J. avatar"
+                          src={profile.avatar || '/reference-visuals/driver-1.png'}
+                          alt={`${profile.name || 'Passenger'} profile`}
                           className="w-7 h-7 rounded-full border border-neon-pink/60 object-cover"
                         />
                         <p className="text-sm font-semibold text-white">Notifications</p>
@@ -166,11 +165,11 @@ export default function Navbar() {
                   aria-label="Profile menu"
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80"
-                    alt="Sarah J. avatar"
+                    src={profile.avatar || '/reference-visuals/driver-1.png'}
+                    alt={`${profile.name || 'Passenger'} profile`}
                     className="w-7 h-7 rounded-full border-2 border-neon-pink/60 object-cover"
                   />
-                  <span className="hidden sm:inline text-sm font-medium text-white">Sarah J.</span>
+                  <span className="hidden sm:inline text-sm font-medium text-white">{profile.name}</span>
                   <ChevronDown size={14} className="hidden sm:inline text-slate-400" />
                 </button>
 
@@ -178,13 +177,13 @@ export default function Navbar() {
                   <div className="absolute right-0 top-12 w-52 rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl p-2 z-50">
                     <div className="flex items-center gap-3 px-2 py-2 border-b border-white/5 mb-1">
                       <img
-                        src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80"
-                        alt="Sarah J. avatar"
+                        src={profile.avatar || '/reference-visuals/driver-1.png'}
+                        alt={`${profile.name || 'Passenger'} profile`}
                         className="w-9 h-9 rounded-full object-cover border border-neon-pink/60"
                       />
                       <div>
-                        <p className="text-sm font-semibold text-white">Sarah J.</p>
-                        <p className="text-[10px] text-slate-400">Verified rider</p>
+                        <p className="text-sm font-semibold text-white">{profile.name}</p>
+                        <p className="text-[10px] text-slate-400">Passenger account</p>
                       </div>
                     </div>
 
@@ -193,7 +192,7 @@ export default function Navbar() {
                       onClick={closeProfileMenu}
                       className="block px-3 py-2 text-sm text-slate-200 hover:bg-slate-800/70 rounded-xl transition-colors"
                     >
-                      View profile
+                      Edit profile
                     </NavLink>
                     <NavLink
                       to="/my-rides"
@@ -210,10 +209,13 @@ export default function Navbar() {
                       Support
                     </NavLink>
                     <button
-                      onClick={closeProfileMenu}
+                      onClick={() => {
+                        closeProfileMenu()
+                        logout()
+                      }}
                       className="w-full text-left px-3 py-2 mt-1 text-sm text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
                     >
-                      Close menu
+                      Log out
                     </button>
                   </div>
                 )}
@@ -235,7 +237,7 @@ export default function Navbar() {
                 end={link.to === '/'}
                 className={({ isActive }) =>
                   `flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-center transition-colors ${
-                    isActive ? 'text-neon-pink' : 'text-slate-500'
+                    getNavLinkActive(link, isActive, location.hash) ? 'text-neon-pink' : 'text-slate-500'
                   }`
                 }
               >
@@ -250,4 +252,10 @@ export default function Navbar() {
       <SOSModal open={sosOpen} onClose={() => setSosOpen(false)} />
     </>
   )
+}
+
+function getNavLinkActive(link, isActive, hash) {
+  if (link.label === 'About') return isActive && hash === '#about'
+  if (link.to === '/') return isActive && hash !== '#about'
+  return isActive
 }

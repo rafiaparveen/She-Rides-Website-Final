@@ -15,7 +15,7 @@ const features = [
     key: 'phoneMasking',
     icon: PhoneOff,
     title: 'Encrypted Phone Masking',
-    desc: 'Riders and drivers connect through a masked, encrypted number. Your real phone number is never revealed to the other party.',
+    desc: 'Passengers and drivers connect through a masked, encrypted number. Your real phone number is never revealed to the other party.',
   },
   {
     key: 'routeMonitoring',
@@ -67,7 +67,11 @@ export default function Safety() {
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-pink/20 to-neon-violet/20 border border-neon-pink/30 flex items-center justify-center">
                     <Icon className="text-neon-pink" size={22} />
                   </div>
-                  <ToggleSwitch checked={enabled} onChange={() => toggleSafetySetting(f.key)} />
+                  <ToggleSwitch
+                    label={f.title}
+                    checked={enabled}
+                    onChange={() => toggleSafetySetting(f.key)}
+                  />
                 </div>
                 <h3 className="text-white font-semibold text-lg mb-1.5">{f.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
@@ -135,18 +139,20 @@ export default function Safety() {
   )
 }
 
-function ToggleSwitch({ checked, onChange }) {
+function ToggleSwitch({ label, checked, onChange }) {
   return (
     <button
+      type="button"
       onClick={onChange}
       role="switch"
       aria-checked={checked}
-      className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${
+      aria-label={`${label}: ${checked ? 'on' : 'off'}`}
+      className={`w-11 h-6 rounded-full transition-colors relative shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-pink ${
         checked ? 'bg-gradient-to-r from-neon-pink to-neon-violet' : 'bg-slate-700'
       }`}
     >
       <span
-        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+        className={`absolute left-0.5 top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
           checked ? 'translate-x-5' : 'translate-x-0.5'
         }`}
       />

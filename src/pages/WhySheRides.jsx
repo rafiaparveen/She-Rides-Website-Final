@@ -41,7 +41,7 @@ const safetyFeatures = [
 
 export default function WhySheRides() {
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div id="about" className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 scroll-mt-20">
       <motion.section
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -64,7 +64,7 @@ export default function WhySheRides() {
               SheRides connects women with trained female captains for reliable rides, practical fares and safety tools that stay close throughout the journey.
             </p>
             <Link to="/" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-neon-pink to-neon-violet px-5 py-3 text-sm font-bold text-white shadow-glow hover:brightness-110">
-              Book your next ride <ArrowRight size={16} />
+              Explore your dashboard <ArrowRight size={16} />
             </Link>
           </div>
 

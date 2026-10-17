@@ -5,15 +5,26 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "node --watch server/index.js",
+    "server": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "vite build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
     "framer-motion": "^11.0.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.383.0",
+    "mapbox-gl": "^3.33.0",
+    "mongoose": "^9.11.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
@@ -27,6 +38,4 @@
     "tailwindcss": "^3.4.3",
     "vite": "^5.2.0"
   }
-  
 }
-

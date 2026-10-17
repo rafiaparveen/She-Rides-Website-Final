@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext.jsx'
+import ProfilePhoto from '../components/ProfilePhoto.jsx'
 
 export default function Profile() {
   const { profile, updateProfile, contacts, addContact, updateContact, removeContact } = useApp()
@@ -54,30 +55,21 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
           {/* Profile card */}
           <div className="glass-card rounded-3xl p-6 flex flex-col items-center text-center h-fit">
-            <div className="relative mb-4">
-              <img
-                src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80"
-                alt={profile.name}
-                className="w-24 h-24 rounded-full border-4 border-neon-pink/50 shadow-glow"
-              />
-              {profile.verified && (
-                <span className="absolute bottom-0 right-0 bg-emerald-500 rounded-full p-1.5 border-4 border-midnight-950">
-                  <BadgeCheck size={14} className="text-white" />
-                </span>
-              )}
+            <div className="mb-4">
+              <ProfilePhoto profile={profile} updateProfile={updateProfile} verified={profile.verified} />
             </div>
 
             {editing ? (
               <div className="w-full space-y-2.5 text-left">
                 <Field label="Full name" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} />
-                <Field label="Email" value={form.email} onChange={(v) => setForm((f) => ({ ...f, email: v }))} />
+                <Field label="Email" value={form.email} disabled onChange={(v) => setForm((f) => ({ ...f, email: v }))} />
                 <Field label="Phone" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))} />
                 <Field label="Address" value={form.address} onChange={(v) => setForm((f) => ({ ...f, address: v }))} />
               </div>
             ) : (
               <>
                 <h2 className="text-white font-display font-bold text-xl">{profile.name}</h2>
-                <p className="text-slate-500 text-sm mb-4">Rider in Karachi since Jan 2025</p>
+                <p className="text-slate-500 text-sm mb-4">Passenger in Karachi since Jan 2025</p>
                 {profile.verified && (
                   <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/30 px-3 py-1.5 rounded-full mb-5">
                     <ShieldCheck size={14} /> 100% Verified Female
@@ -145,14 +137,15 @@ export default function Profile() {
   )
 }
 
-function Field({ label, value, onChange }) {
+function Field({ label, value, onChange, disabled = false }) {
   return (
     <div>
       <label className="text-[11px] font-medium text-slate-500 mb-1 block">{label}</label>
       <input
         value={value}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-800/60 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-neon-pink/60 transition-colors"
+        className="w-full bg-slate-800/60 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-neon-pink/60 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       />
     </div>
   )
@@ -188,25 +181,38 @@ function CnicSection() {
 
 function CnicUploadBox({ side, label, file, onUpload }) {
   const inputRef = useRef(null)
+  const timeoutRefs = useRef([])
+  const previewUrlRef = useRef(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const [status, setStatus] = useState(file?.status || null) // null | 'uploading' | 'pending' | 'verified'
+
+  useEffect(() => () => {
+    timeoutRefs.current.forEach(clearTimeout)
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current)
+  }, [])
 
   function handleFile(e) {
     const f = e.target.files?.[0]
     if (!f) return
+    timeoutRefs.current.forEach(clearTimeout)
+    timeoutRefs.current = []
     const url = URL.createObjectURL(f)
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current)
+    previewUrlRef.current = url
     setPreviewUrl(url)
     setStatus('uploading')
     onUpload(side, { name: f.name, status: 'uploading', uploadedAt: new Date().toISOString() })
 
-    setTimeout(() => {
+    const pendingTimeout = setTimeout(() => {
       setStatus('pending')
       onUpload(side, { name: f.name, status: 'pending', uploadedAt: new Date().toISOString() })
-      setTimeout(() => {
+      const verifiedTimeout = setTimeout(() => {
         setStatus('verified')
         onUpload(side, { name: f.name, status: 'verified', uploadedAt: new Date().toISOString() })
       }, 1800)
+      timeoutRefs.current.push(verifiedTimeout)
     }, 900)
+    timeoutRefs.current.push(pendingTimeout)
   }
 
   return (

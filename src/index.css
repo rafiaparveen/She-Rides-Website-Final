@@ -52,6 +52,15 @@ h1, h2, h3, h4, .font-display {
   filter: brightness(1.1);
 }
 
+@keyframes auth-loading {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+.auth-loading-bar {
+  animation: auth-loading 1.2s ease-in-out infinite;
+}
+
 /* Smooth, consistent interactive feedback across cards & buttons */
 .hover-lift {
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, border-color 0.25s ease;
@@ -73,7 +82,13 @@ button, select, input, a {
   background: #0d1424 !important;
 }
 .leaflet-control-attribution {
-  display: none !important;
+  background: rgba(11, 15, 25, 0.8) !important;
+  color: #cbd5e1 !important;
+  border-radius: 6px 0 0 !important;
+  padding: 2px 5px !important;
+}
+.leaflet-control-attribution a {
+  color: #f9a8d4 !important;
 }
 
 :focus-visible {
